@@ -1,10 +1,13 @@
 import { logout } from "@/features/auth";
 import { CreateChatForm } from "@/features/create-chat";
+import { useReceiveMessages } from "@/features/receive-messages";
 import { Composer } from "@/features/send-message";
 import { resetChats, setActiveChat } from "@/entities/chat";
 import { useAppDispatch, useAppSelector } from "@/shared/lib/redux";
 
 export const ChatPage = () => {
+  useReceiveMessages();
+
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.auth.idInstance);
   const { messages, activeId } = useAppSelector((s) => s.chats);
