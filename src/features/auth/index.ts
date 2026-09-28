@@ -4,3 +4,4 @@ export {
   logout,
   AUTH_STORAGE_KEY,
 } from "./model/authSlice";
+export { LoginForm } from "./ui/LoginForm";
