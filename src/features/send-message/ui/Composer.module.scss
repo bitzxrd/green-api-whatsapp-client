@@ -1,0 +1,37 @@
+.composer {
+  padding: 8px;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.button {
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #6c4dff;
+  color: #fff;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.error {
+  margin: 0 0 8px;
+  color: #d93025;
+  font-size: 14px;
+}

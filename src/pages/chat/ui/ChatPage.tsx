@@ -1,11 +1,13 @@
 import { logout } from "@/features/auth";
-import { addChat, resetChats } from "@/entities/chat";
+import { CreateChatForm } from "@/features/create-chat";
+import { Composer } from "@/features/send-message";
+import { resetChats, setActiveChat } from "@/entities/chat";
 import { useAppDispatch, useAppSelector } from "@/shared/lib/redux";
 
 export const ChatPage = () => {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.auth.idInstance);
-  const chats = useAppSelector((s) => s.chats.messages);
+  const { messages, activeId } = useAppSelector((s) => s.chats);
 
   const handleLogout = () => {
     dispatch(resetChats());
@@ -15,11 +17,25 @@ export const ChatPage = () => {
   return (
     <div>
       <p>Instance: {id}</p>
-      <p>Chats: {Object.keys(chats).join(", ") || "none"}</p>
-      <button onClick={() => dispatch(addChat("77000000000"))}>
-        test chat
-      </button>
       <button onClick={handleLogout}>Выйти</button>
+
+      <CreateChatForm />
+      <ul>
+        {Object.keys(messages).map((phone) => (
+          <li key={phone} onClick={() => dispatch(setActiveChat(phone))}>
+            {phone === activeId ? "● " : ""}+{phone}
+          </li>
+        ))}
+      </ul>
+
+      <ul>
+        {(activeId ? messages[activeId] : []).map((m) => (
+          <li key={m.id}>
+            {m.out ? "→" : "←"} {m.text}
+          </li>
+        ))}
+      </ul>
+      <Composer />
     </div>
   );
 };
