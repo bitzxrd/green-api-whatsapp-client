@@ -26,6 +26,17 @@ const chatsSlice = createSlice({
       if (!list.some((m) => m.id === payload.message.id))
         list.push(payload.message);
     },
+    setChatHistory: (
+      state,
+      { payload }: PayloadAction<{ phone: string; history: Message[] }>,
+    ) => {
+      const existing = state.messages[payload.phone] ?? [];
+      const byId = new Map(payload.history.map((m) => [m.id, m]));
+      for (const m of existing) byId.set(m.id, m);
+      state.messages[payload.phone] = [...byId.values()].sort(
+        (a, b) => a.ts - b.ts,
+      );
+    },
     setActiveChat: (state, { payload }: PayloadAction<string | null>) => {
       state.activeId = payload;
     },
@@ -33,6 +44,11 @@ const chatsSlice = createSlice({
   },
 });
 
-export const { addChat, addMessage, setActiveChat, resetChats } =
-  chatsSlice.actions;
+export const {
+  addChat,
+  addMessage,
+  setChatHistory,
+  setActiveChat,
+  resetChats,
+} = chatsSlice.actions;
 export default chatsSlice.reducer;
