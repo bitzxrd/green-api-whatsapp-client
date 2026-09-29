@@ -1,75 +1,55 @@
-# React + TypeScript + Vite
+# Green API WhatsApp Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-интерфейс для отправки и приёма текстовых сообщений в WhatsApp через [GREEN-API](https://green-api.com).
+Тестовое задание на позицию "Фронтенд разработчик React".
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React + TypeScript (Vite)
+- Redux Toolkit + RTK Query
+- SCSS (mobile-first)
+- Упрощённая FSD-архитектура
 
-## React Compiler
+## Как это работает
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Пользователь вводит `idInstance` и `apiTokenInstance` от своего аккаунта GREEN-API. Перед входом креды проверяются запросом [GetStateInstance](https://green-api.com/docs/api/account/GetStateInstance/).
+2. Создаёт чат по номеру телефона получателя.
+3. При открытии чата подгружается история переписки методом [GetChatHistory](https://green-api.com/docs/api/journals/GetChatHistory/).
+4. Отправка новых сообщений — методом [SendMessage](https://green-api.com/docs/api/sending/SendMessage/).
+5. Приём сообщений — long polling методами [ReceiveNotification / DeleteNotification](https://green-api.com/docs/api/receiving/technology-http-api/).
 
-## Expanding the ESLint configuration
+Креды и локальная копия переписки хранятся в `localStorage` браузера, сервера на бэкенде нет.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Требования
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- [Node.js](https://nodejs.org/) версии 18 или новее (проверить: `node -v`)
+- npm (устанавливается вместе с Node.js)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Запуск локально
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone <ссылка на репозиторий>
+cd green-api-whatsapp-client
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Приложение откроется на `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Перед первым входом:
+1. Зарегистрируйтесь на [green-api.com](https://green-api.com), создайте инстанс и привяжите его к WhatsApp через QR-код.
+2. В настройках инстанса (`SetSettings`) поле `webhookUrl` должно быть **пустым** — иначе входящие уведомления не попадут в очередь для `ReceiveNotification`.
+3. На странице входа введите `idInstance` и `apiTokenInstance` из личного кабинета.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Сборка
 
+```bash
+npm run build
 ```
+
+Собранные файлы окажутся в `dist/`.
+
+## Известные ограничения
+
+- Бесплатный тариф "Разработчик" ограничивает взаимодействие тремя чатами на инстанс.
+- Поддерживаются только текстовые сообщения, как указано в задании.
