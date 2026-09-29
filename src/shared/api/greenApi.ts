@@ -7,20 +7,23 @@ import type {
 import { getApiUrl } from "@/shared/lib/apiUrl";
 import type { Credentials } from "./types";
 
+interface RequestArgs extends FetchArgs {
+  greenApiCredentials?: Credentials;
+}
+
 const baseQuery: BaseQueryFn<
-  string | FetchArgs,
+  string | RequestArgs,
   unknown,
   FetchBaseQueryError
 > = (args, api, extra) => {
-  const { idInstance, apiTokenInstance } = (
-    api.getState() as { auth: Credentials }
-  ).auth;
   const req = typeof args === "string" ? { url: args } : args;
+  const creds =
+    req.greenApiCredentials ?? (api.getState() as { auth: Credentials }).auth;
 
-  return fetchBaseQuery({ baseUrl: getApiUrl(idInstance) })(
+  return fetchBaseQuery({ baseUrl: getApiUrl(creds.idInstance) })(
     {
       ...req,
-      url: `waInstance${idInstance}/${req.url.replace(":token", apiTokenInstance)}`,
+      url: `waInstance${creds.idInstance}/${req.url.replace(":token", creds.apiTokenInstance)}`,
     },
     api,
     extra,

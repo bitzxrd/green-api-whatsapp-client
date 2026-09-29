@@ -33,8 +33,6 @@ export const useReceiveMessages = () => {
           if (n && !stopped) {
             gotNotification = true;
             const { body } = n;
-            console.log(body.typeWebhook, body);
-
             const chatId = body.senderData?.chatId;
             const text = getText(body.messageData);
 

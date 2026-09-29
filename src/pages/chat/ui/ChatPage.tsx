@@ -1,16 +1,22 @@
 import { logout } from "@/features/auth";
-import { CreateChatForm } from "@/features/create-chat";
 import { useReceiveMessages } from "@/features/receive-messages";
 import { Composer } from "@/features/send-message";
-import { resetChats, setActiveChat } from "@/entities/chat";
+import {
+  addChat,
+  ChatList,
+  MessageBubble,
+  resetChats,
+  setActiveChat,
+} from "@/entities/chat";
 import { useAppDispatch, useAppSelector } from "@/shared/lib/redux";
+import s from "./ChatPage.module.scss";
 
 export const ChatPage = () => {
   useReceiveMessages();
 
   const dispatch = useAppDispatch();
-  const id = useAppSelector((s) => s.auth.idInstance);
-  const { messages, activeId } = useAppSelector((s) => s.chats);
+  const { messages, activeId } = useAppSelector((state) => state.chats);
+  const activeMessages = activeId ? messages[activeId] : undefined;
 
   const handleLogout = () => {
     dispatch(resetChats());
@@ -18,27 +24,44 @@ export const ChatPage = () => {
   };
 
   return (
-    <div>
-      <p>Instance: {id}</p>
-      <button onClick={handleLogout}>Выйти</button>
+    <div className={s.page}>
+      <aside className={`${s.sidebar} ${activeId ? s["sidebar--hidden"] : ""}`}>
+        <ChatList
+          messages={messages}
+          activeId={activeId}
+          onSelect={(phone) => dispatch(setActiveChat(phone))}
+          onCreate={(phone) => dispatch(addChat(phone))}
+          onLogout={handleLogout}
+        />
+      </aside>
 
-      <CreateChatForm />
-      <ul>
-        {Object.keys(messages).map((phone) => (
-          <li key={phone} onClick={() => dispatch(setActiveChat(phone))}>
-            {phone === activeId ? "● " : ""}+{phone}
-          </li>
-        ))}
-      </ul>
+      <main className={`${s.window} ${activeId ? "" : s["window--hidden"]}`}>
+        {activeId ? (
+          <>
+            <header className={s.header}>
+              <button
+                className={s.back}
+                onClick={() => dispatch(setActiveChat(null))}
+                aria-label="Назад"
+              >
+                ←
+              </button>
+              <div className={s.avatar}>{activeId.slice(-2)}</div>
+              <span className={s.title}>+{activeId}</span>
+            </header>
 
-      <ul>
-        {(activeId ? messages[activeId] : []).map((m) => (
-          <li key={m.id}>
-            {m.out ? "→" : "←"} {m.text}
-          </li>
-        ))}
-      </ul>
-      <Composer />
+            <div className={s.messages}>
+              {activeMessages?.map((m) => (
+                <MessageBubble key={m.id} message={m} />
+              ))}
+            </div>
+
+            <Composer />
+          </>
+        ) : (
+          <p className={s.empty}>Выберите чат или создайте новый</p>
+        )}
+      </main>
     </div>
   );
 };
